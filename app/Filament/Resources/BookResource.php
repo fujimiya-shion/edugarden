@@ -2,11 +2,12 @@
 
 namespace App\Filament\Resources;
 
+use BackedEnum;
 use App\Filament\Resources\BookResource\Pages;
 use App\Models\Book;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,11 +19,11 @@ class BookResource extends Resource
     protected static ?string $modelLabel = 'Sản phẩm';
     protected static ?string $pluralModelLabel = 'Danh sách sản phẩm';
     protected static ?string $navigationLabel = 'Quản lý sản phẩm';
-    protected static ?string $navigationIcon = 'heroicon-o-book-open';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-book-open';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\TextInput::make('title')
                     ->required()
