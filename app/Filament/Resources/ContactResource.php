@@ -2,29 +2,28 @@
 
 namespace App\Filament\Resources;
 
+use BackedEnum;
 use App\Filament\Resources\ContactResource\Pages;
 use App\Models\Contact;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ContactResource extends Resource
 {
     protected static ?string $model = Contact::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-device-phone-mobile';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-device-phone-mobile';
     protected static ?string $navigationLabel = 'Quản lý liên hệ';
     protected static ?string $pluralLabel = 'Danh sách liên hệ';
     protected static ?string $label = 'Liên hệ';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Forms\Components\TextInput::make('name')
                 ->label('Họ và tên')
                 ->required(),

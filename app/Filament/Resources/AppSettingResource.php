@@ -2,28 +2,26 @@
 
 namespace App\Filament\Resources;
 
+use BackedEnum;
 use App\Enums\ModuleTypes;
 use App\Filament\Resources\AppSettingResource\Pages;
-use App\Filament\Resources\AppSettingResource\RelationManagers;
-use App\Implementations\Services\Page\IPageService;
 use App\Models\AppSetting;
 use App\Models\Page;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class AppSettingResource extends Resource
 {
     protected static ?string $model = AppSetting::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
-    public static function form(Form $form): Form
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-cog-6-tooth';
+
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Toggle::make('is_active')
                     ->label('Sử dụng cấu hình này'),

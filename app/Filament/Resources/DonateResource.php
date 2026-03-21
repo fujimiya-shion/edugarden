@@ -2,11 +2,12 @@
 
 namespace App\Filament\Resources;
 
+use BackedEnum;
 use App\Filament\Resources\DonateResource\Pages;
 use App\Models\Donate;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -14,14 +15,14 @@ class DonateResource extends Resource
 {
     protected static ?string $model = Donate::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-currency-dollar';
     protected static ?string $navigationLabel = 'Quản lý dâng hiến';
     protected static ?string $modelLabel = 'Dâng hiến';
     protected static ?string $pluralModelLabel = 'Dâng hiến';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
+        return $schema->schema([
             Forms\Components\TextInput::make('name')->label('Họ và tên')->required(),
             Forms\Components\TextInput::make('email')->label('Email')->email(),
             Forms\Components\TextInput::make('phone')->label('Số điện thoại'),

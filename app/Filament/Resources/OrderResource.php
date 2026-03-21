@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use BackedEnum;
 use App\Enums\DeliveryStatuses;
 use App\Enums\PaymentMethods;
 use App\Enums\PaymentStatuses;
@@ -9,14 +10,12 @@ use App\Filament\RelationManagers\OrderItemsRelationManager;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BadgeColumn;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class OrderResource extends Resource
 {
@@ -25,11 +24,11 @@ class OrderResource extends Resource
     protected static ?string $modelLabel = 'Đơn hàng';
     protected static ?string $pluralModelLabel = 'Danh sách đơn hàng';
     protected static ?string $navigationLabel = 'Quản lý đơn hàng';
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-shopping-cart';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Forms\Components\Card::make([
                     Forms\Components\Placeholder::make('user_id')
