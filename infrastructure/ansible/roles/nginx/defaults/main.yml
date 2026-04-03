@@ -1,0 +1,21 @@
+---
+nginx_domain: example.com
+public_env_file: "{{ playbook_dir }}/../../.env"
+secret_env_file: "/opt/edugarden/secret.env"
+nginx_app_env_file: "{{ public_env_file }}"
+nginx_app_port: "{{ lookup('ansible.builtin.ini', 'APP_PORT type=properties file=' ~ nginx_app_env_file, default='8000') }}"
+nginx_client_max_body_size: 64m
+nginx_proxy_read_timeout: 300s
+nginx_proxy_connect_timeout: 60s
+nginx_proxy_send_timeout: 300s
+nginx_ssl_certificate: /etc/letsencrypt/live/{{ nginx_domain }}/fullchain.pem
+nginx_ssl_certificate_key: /etc/letsencrypt/live/{{ nginx_domain }}/privkey.pem
+nginx_upstream_servers: >-
+  {{
+    groups['app_servers']
+    | default([])
+    | map('extract', hostvars)
+    | map(attribute='ansible_host')
+    | reject('equalto', None)
+    | list
+  }}

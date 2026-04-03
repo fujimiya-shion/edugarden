@@ -1,0 +1,20 @@
+upstream app {
+{% for server in nginx_upstream_servers %}
+    server {{ server }}:{{ nginx_app_port }};
+{% endfor %}
+    keepalive 32;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name {{ nginx_domain }};
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}

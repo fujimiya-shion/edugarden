@@ -9,6 +9,9 @@
 .env
 .env.backup
 .env.production
+deploy/env/*.env
+!deploy/env/*.example
+infrastructure/ansible/inventory/hosts.ini
 .phpactor.json
 .phpunit.result.cache
 Homestead.json

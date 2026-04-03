@@ -1,0 +1,52 @@
+---
+- name: Ensure Debian-based OS
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family == "Debian"
+    fail_msg: "The nginx role currently supports Debian/Ubuntu only."
+
+- name: Install Nginx
+  ansible.builtin.apt:
+    name:
+      - certbot
+      - nginx
+      - python3-certbot-nginx
+    state: present
+    update_cache: true
+
+- name: Ensure nginx domain is configured
+  ansible.builtin.assert:
+    that:
+      - nginx_domain | length > 0
+      - nginx_upstream_servers | length > 0
+    fail_msg: "Set nginx_domain and ensure app_servers has reachable ansible_host values."
+
+- name: Ensure nginx include directory exists
+  ansible.builtin.file:
+    path: "/etc/nginx/conf.d/{{ nginx_domain }}.d"
+    state: directory
+    mode: "0755"
+
+- name: Render nginx vhost config
+  ansible.builtin.template:
+    src: domain.conf.j2
+    dest: "/etc/nginx/conf.d/{{ nginx_domain }}.conf"
+    mode: "0644"
+  notify: Reload nginx
+
+- name: Render nginx ssl include config
+  ansible.builtin.template:
+    src: ssl.conf.j2
+    dest: "/etc/nginx/conf.d/{{ nginx_domain }}.d/ssl.conf"
+    mode: "0644"
+  notify: Reload nginx
+
+- name: Ensure nginx config is valid
+  ansible.builtin.command: nginx -t
+  changed_when: false
+
+- name: Ensure Nginx service is enabled and started
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
