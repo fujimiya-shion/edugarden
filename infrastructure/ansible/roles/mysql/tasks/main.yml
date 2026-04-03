@@ -19,18 +19,18 @@
     state: started
     enabled: true
 
-- name: Check app env file on MySQL server
+- name: Check secret env file on MySQL server
   ansible.builtin.stat:
-    path: "{{ mysql_public_env_file }}"
-  register: mysql_public_env_stat
+    path: "{{ mysql_secret_env_file }}"
+  register: mysql_secret_env_stat
 
-- name: Ensure app env file exists on MySQL server
+- name: Ensure secret env file exists on MySQL server
   ansible.builtin.assert:
     that:
-      - mysql_public_env_stat.stat.exists
-    fail_msg: "Missing env file on MySQL server: {{ mysql_public_env_file }}"
+      - mysql_secret_env_stat.stat.exists
+    fail_msg: "Missing secret env file on MySQL server: {{ mysql_secret_env_file }}"
 
-- name: Read database settings from env file
+- name: Read database settings from secret env file
   ansible.builtin.shell: |
     set -e
     awk -F= '
@@ -38,7 +38,7 @@
       /^DB_USERNAME=/{print "DB_USERNAME=" substr($0, index($0, "=") + 1)}
       /^DB_PASSWORD=/{print "DB_PASSWORD=" substr($0, index($0, "=") + 1)}
       /^DB_ROOT_PASSWORD=/{print "DB_ROOT_PASSWORD=" substr($0, index($0, "=") + 1)}
-    ' "{{ mysql_public_env_file }}"
+    ' "{{ mysql_secret_env_file }}"
   register: mysql_env_values
   changed_when: false
 
@@ -56,13 +56,16 @@
       - mysql_app_username | length > 0
       - mysql_app_password | length > 0 or mysql_app_username == "root"
       - mysql_root_password | length > 0
-    fail_msg: "DB_ROOT_PASSWORD, DB_DATABASE, DB_USERNAME and DB_PASSWORD (when DB_USERNAME is not root) must be set in {{ mysql_public_env_file }}"
+    fail_msg: "DB_ROOT_PASSWORD, DB_DATABASE, DB_USERNAME and DB_PASSWORD (when DB_USERNAME is not root) must be set in {{ mysql_secret_env_file }}"
 
 - name: Set MySQL root password
   ansible.builtin.shell: |
     set -e
     mysql --protocol=socket -uroot <<'SQL'
-    ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mysql_root_password }}';
+    ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY '{{ mysql_root_password }}';
+    ALTER USER IF EXISTS 'root'@'127.0.0.1' IDENTIFIED WITH caching_sha2_password BY '{{ mysql_root_password }}';
+    DROP USER IF EXISTS ''@'localhost';
+    DROP USER IF EXISTS ''@'%';
     FLUSH PRIVILEGES;
     SQL
   register: mysql_set_root_password
@@ -73,7 +76,10 @@
   ansible.builtin.shell: |
     set -e
     MYSQL_PWD='{{ mysql_root_password }}' mysql --protocol=socket -uroot <<'SQL'
-    ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mysql_root_password }}';
+    ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY '{{ mysql_root_password }}';
+    ALTER USER IF EXISTS 'root'@'127.0.0.1' IDENTIFIED WITH caching_sha2_password BY '{{ mysql_root_password }}';
+    DROP USER IF EXISTS ''@'localhost';
+    DROP USER IF EXISTS ''@'%';
     FLUSH PRIVILEGES;
     SQL
   when: mysql_set_root_password.rc != 0

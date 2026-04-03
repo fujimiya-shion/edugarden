@@ -9,7 +9,7 @@ What it installs:
   - Docker Compose plugin
 - `mysql` role on `mysql_servers`
   - MySQL Server
-  - reads `DB_ROOT_PASSWORD`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` from `.env`
+  - reads `DB_ROOT_PASSWORD`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` from `secret_env_file`
 - `nginx` role on `lb_servers`
   - Nginx
   - Certbot
@@ -34,7 +34,7 @@ cp inventory/hosts.ini.example inventory/hosts.ini
 ```
 
 2. Edit `inventory/hosts.ini` with real hosts and SSH users.
-   Set `public_env_file` on each `mysql_servers` host if the env path differs.
+   Set `secret_env_file` on each `mysql_servers` host if the secret path differs.
    Set `nginx_domain` on each `lb_servers` host.
    Set `public_env_file` on each `app_servers` host if the app env path differs.
    Set `public_env_file` and `secret_env_file` on each `lb_servers` host if your deploy paths differ.

@@ -1,3 +1,3 @@
 ---
-public_env_file: "{{ playbook_dir }}/../../.env"
-mysql_public_env_file: "{{ public_env_file }}"
+secret_env_file: "/opt/edugarden/secret.env"
+mysql_secret_env_file: "{{ secret_env_file }}"
