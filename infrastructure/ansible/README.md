@@ -7,6 +7,9 @@ What it installs:
 - `docker` role on `app_servers`
   - Docker Engine
   - Docker Compose plugin
+- `mysql` role on `mysql_servers`
+  - MySQL Server
+  - reads `DB_ROOT_PASSWORD`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` from `.env`
 - `nginx` role on `lb_servers`
   - Nginx
   - Certbot
@@ -18,6 +21,7 @@ What it installs:
 - `inventory/hosts.ini.example`: inventory template
 - `site.yml`: main playbook
 - `roles/docker`: install Docker and Compose plugin
+- `roles/mysql`: install MySQL Server
 - `roles/nginx`: install Nginx
 
 ## Usage
@@ -30,6 +34,7 @@ cp inventory/hosts.ini.example inventory/hosts.ini
 ```
 
 2. Edit `inventory/hosts.ini` with real hosts and SSH users.
+   Set `public_env_file` on each `mysql_servers` host if the env path differs.
    Set `nginx_domain` on each `lb_servers` host.
    Set `public_env_file` on each `app_servers` host if the app env path differs.
    Set `public_env_file` and `secret_env_file` on each `lb_servers` host if your deploy paths differ.

@@ -1,0 +1,100 @@
+---
+- name: Ensure Debian-based OS
+  ansible.builtin.assert:
+    that:
+      - ansible_facts["os_family"] == "Debian"
+    fail_msg: "The mysql role currently supports Debian/Ubuntu only."
+
+- name: Install MySQL server
+  ansible.builtin.apt:
+    name:
+      - mysql-server
+      - python3-pymysql
+    state: present
+    update_cache: true
+
+- name: Ensure MySQL service is enabled and started
+  ansible.builtin.service:
+    name: mysql
+    state: started
+    enabled: true
+
+- name: Check app env file on MySQL server
+  ansible.builtin.stat:
+    path: "{{ mysql_public_env_file }}"
+  register: mysql_public_env_stat
+
+- name: Ensure app env file exists on MySQL server
+  ansible.builtin.assert:
+    that:
+      - mysql_public_env_stat.stat.exists
+    fail_msg: "Missing env file on MySQL server: {{ mysql_public_env_file }}"
+
+- name: Read database settings from env file
+  ansible.builtin.shell: |
+    set -e
+    awk -F= '
+      /^DB_DATABASE=/{print "DB_DATABASE=" substr($0, index($0, "=") + 1)}
+      /^DB_USERNAME=/{print "DB_USERNAME=" substr($0, index($0, "=") + 1)}
+      /^DB_PASSWORD=/{print "DB_PASSWORD=" substr($0, index($0, "=") + 1)}
+      /^DB_ROOT_PASSWORD=/{print "DB_ROOT_PASSWORD=" substr($0, index($0, "=") + 1)}
+    ' "{{ mysql_public_env_file }}"
+  register: mysql_env_values
+  changed_when: false
+
+- name: Resolve database settings
+  ansible.builtin.set_fact:
+    mysql_app_database: "{{ mysql_env_values.stdout | regex_search('(?m)^DB_DATABASE=(.*)$', '\\1') | first | default('') }}"
+    mysql_app_username: "{{ mysql_env_values.stdout | regex_search('(?m)^DB_USERNAME=(.*)$', '\\1') | first | default('') }}"
+    mysql_app_password: "{{ mysql_env_values.stdout | regex_search('(?m)^DB_PASSWORD=(.*)$', '\\1') | first | default('') }}"
+    mysql_root_password: "{{ mysql_env_values.stdout | regex_search('(?m)^DB_ROOT_PASSWORD=(.*)$', '\\1') | first | default('') }}"
+
+- name: Ensure required MySQL env values are present
+  ansible.builtin.assert:
+    that:
+      - mysql_app_database | length > 0
+      - mysql_app_username | length > 0
+      - mysql_app_password | length > 0 or mysql_app_username == "root"
+      - mysql_root_password | length > 0
+    fail_msg: "DB_ROOT_PASSWORD, DB_DATABASE, DB_USERNAME and DB_PASSWORD (when DB_USERNAME is not root) must be set in {{ mysql_public_env_file }}"
+
+- name: Set MySQL root password
+  ansible.builtin.shell: |
+    set -e
+    mysql --protocol=socket -uroot <<'SQL'
+    ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mysql_root_password }}';
+    FLUSH PRIVILEGES;
+    SQL
+  register: mysql_set_root_password
+  changed_when: "'ALTER USER' in mysql_set_root_password.stdout or mysql_set_root_password.rc == 0"
+  failed_when: false
+
+- name: Set MySQL root password with existing password
+  ansible.builtin.shell: |
+    set -e
+    MYSQL_PWD='{{ mysql_root_password }}' mysql --protocol=socket -uroot <<'SQL'
+    ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mysql_root_password }}';
+    FLUSH PRIVILEGES;
+    SQL
+  when: mysql_set_root_password.rc != 0
+  changed_when: false
+
+- name: Ensure application database exists
+  ansible.builtin.shell: |
+    set -e
+    MYSQL_PWD='{{ mysql_root_password }}' mysql --protocol=socket -uroot <<'SQL'
+    CREATE DATABASE IF NOT EXISTS `{{ mysql_app_database }}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    SQL
+  changed_when: false
+
+- name: Ensure application MySQL user exists
+  ansible.builtin.shell: |
+    set -e
+    MYSQL_PWD='{{ mysql_root_password }}' mysql --protocol=socket -uroot <<'SQL'
+    CREATE USER IF NOT EXISTS '{{ mysql_app_username }}'@'%' IDENTIFIED BY '{{ mysql_app_password }}';
+    ALTER USER '{{ mysql_app_username }}'@'%' IDENTIFIED BY '{{ mysql_app_password }}';
+    GRANT ALL PRIVILEGES ON `{{ mysql_app_database }}`.* TO '{{ mysql_app_username }}'@'%';
+    FLUSH PRIVILEGES;
+    SQL
+  when: mysql_app_username != "root"
+  changed_when: false
