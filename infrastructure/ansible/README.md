@@ -10,6 +10,8 @@ What it installs:
 - `mysql` role on `mysql_servers`
   - MySQL Server
   - reads `DB_ROOT_PASSWORD`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` from `secret_env_file`
+- `redis` role on `redis_servers`
+  - Redis Server
 - `nginx` role on `lb_servers`
   - Nginx
   - Certbot
@@ -22,6 +24,7 @@ What it installs:
 - `site.yml`: main playbook
 - `roles/docker`: install Docker and Compose plugin
 - `roles/mysql`: install MySQL Server
+- `roles/redis`: install Redis Server
 - `roles/nginx`: install Nginx
 
 ## Usage

@@ -4,5 +4,8 @@ app-1 ansible_host=203.0.113.10 ansible_user=ubuntu
 [mysql_servers]
 mysql-1 ansible_host=203.0.113.30 ansible_user=ubuntu public_env_file=/var/www/html/edugarden/.env
 
+[redis_servers]
+redis-1 ansible_host=203.0.113.40 ansible_user=ubuntu
+
 [lb_servers]
 lb-1 ansible_host=203.0.113.20 ansible_user=ubuntu nginx_domain=domain.com public_env_file=/var/www/html/edugarden/.env secret_env_file=/opt/edugarden/secret.env

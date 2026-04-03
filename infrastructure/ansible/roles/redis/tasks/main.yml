@@ -1,0 +1,19 @@
+---
+- name: Ensure Debian-based OS
+  ansible.builtin.assert:
+    that:
+      - ansible_facts["os_family"] == "Debian"
+    fail_msg: "The redis role currently supports Debian/Ubuntu only."
+
+- name: Install Redis server
+  ansible.builtin.apt:
+    name:
+      - redis-server
+    state: present
+    update_cache: true
+
+- name: Ensure Redis service is enabled and started
+  ansible.builtin.service:
+    name: redis-server
+    state: started
+    enabled: true

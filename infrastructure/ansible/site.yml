@@ -11,6 +11,12 @@
   roles:
     - mysql
 
+- name: Provision Redis servers
+  hosts: redis_servers
+  become: true
+  roles:
+    - redis
+
 - name: Provision load balancers
   hosts: lb_servers
   become: true
