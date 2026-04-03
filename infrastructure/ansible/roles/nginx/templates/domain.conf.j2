@@ -1,6 +1,6 @@
 upstream app {
 {% for server in nginx_upstream_servers %}
-    server {{ hostvars[server].ansible_host | default(server) }}:{{ hostvars[server].app_runtime_port | default('8000') }};
+    server {{ hostvars[server].ansible_host | default(server) }}:{{ hostvars[server].app_forward_port | default('80') }};
 {% endfor %}
     keepalive 32;
 }

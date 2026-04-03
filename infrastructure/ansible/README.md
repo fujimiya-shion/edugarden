@@ -41,7 +41,7 @@ cp inventory/hosts.ini.example inventory/hosts.ini
    Set `nginx_domain` on each `lb_servers` host.
    Set `public_env_file` on each `app_servers` host if the app env path differs.
    Set `public_env_file` and `secret_env_file` on each `lb_servers` host if your deploy paths differ.
-   The nginx role uses `APP_PORT` resolved from each app server env file.
+   The nginx role uses `APP_PORT_FORWARD` resolved from each app server env file.
    SSL certs are expected to be created separately with `certbot`.
 
 3. Run the playbook:
