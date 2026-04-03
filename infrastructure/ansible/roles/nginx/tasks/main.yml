@@ -2,7 +2,7 @@
 - name: Ensure Debian-based OS
   ansible.builtin.assert:
     that:
-      - ansible_os_family == "Debian"
+      - ansible_facts["os_family"] == "Debian"
     fail_msg: "The nginx role currently supports Debian/Ubuntu only."
 
 - name: Install Nginx
@@ -19,7 +19,7 @@
     that:
       - nginx_domain | length > 0
       - nginx_upstream_servers | length > 0
-    fail_msg: "Set nginx_domain and ensure app_servers has reachable ansible_host values."
+    fail_msg: "Set nginx_domain and ensure app_servers contains at least one host."
 
 - name: Ensure nginx include directory exists
   ansible.builtin.file:

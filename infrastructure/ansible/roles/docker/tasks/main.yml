@@ -2,7 +2,7 @@
 - name: Ensure Debian-based OS
   ansible.builtin.assert:
     that:
-      - ansible_os_family == "Debian"
+      - ansible_facts["os_family"] == "Debian"
     fail_msg: "The docker role currently supports Debian/Ubuntu only."
 
 - name: Install Docker apt prerequisites
@@ -22,7 +22,7 @@
 
 - name: Resolve Docker apt architecture
   ansible.builtin.set_fact:
-    docker_apt_arch: "{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}.get(ansible_architecture, ansible_architecture) }}"
+    docker_apt_arch: "{{ {'x86_64': 'amd64', 'aarch64': 'arm64'}.get(ansible_facts['architecture'], ansible_facts['architecture']) }}"
 
 - name: Download Docker GPG key
   ansible.builtin.get_url:
@@ -62,3 +62,24 @@
     name: "{{ ansible_user }}"
     groups: docker
     append: true
+
+- name: Check app env file on app server
+  ansible.builtin.stat:
+    path: "{{ app_public_env_file }}"
+  register: app_public_env_stat
+
+- name: Read APP_PORT from app env file
+  ansible.builtin.command:
+    argv:
+      - awk
+      - -F=
+      - '/^APP_PORT=/{print $2; exit}'
+      - "{{ app_public_env_file }}"
+  register: app_port_lookup
+  changed_when: false
+  failed_when: false
+  when: app_public_env_stat.stat.exists
+
+- name: Resolve app runtime port
+  ansible.builtin.set_fact:
+    app_runtime_port: "{{ (app_port_lookup.stdout | trim) if (app_port_lookup.stdout | default('') | trim | length > 0) else app_runtime_port_default }}"
