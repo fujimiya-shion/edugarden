@@ -1,5 +1,7 @@
 x-app-base: &app-base
   image: "${APP_IMAGE:?APP_IMAGE is required}"
+  volumes:
+    - "${APP_STORAGE_PATH:-./storage}:/var/www/html/storage"
   environment: &app-env
     APP_NAME: "${APP_NAME:-EduGarden}"
     APP_ENV: "${APP_ENV:-production}"
