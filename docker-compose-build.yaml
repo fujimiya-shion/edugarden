@@ -1,0 +1,10 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/prod/Dockerfile
+      args:
+        WWWGROUP: "${WWWGROUP:-1000}"
+        WWWUSER: "${WWWUSER:-1000}"
+        NODE_VERSION: "${NODE_VERSION:-24}"
+    image: "${BUILD_APP_IMAGE:?BUILD_APP_IMAGE must be exported by the build shell script, e.g. docker.io/loi/edugarden:$(git describe --tags --always --dirty)}"

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [[ -n "${WWWUSER:-}" ]]; then
+    usermod -u "$WWWUSER" app
+fi
+
+mkdir -p /.composer storage/logs bootstrap/cache
+chmod -R ugo+rw /.composer storage bootstrap/cache
+
+if [[ $# -gt 0 ]]; then
+    exec gosu app "$@"
+fi
+
+exec gosu app php artisan octane:start \
+    --server="${OCTANE_SERVER:-swoole}" \
+    --host="${APP_HOST:-0.0.0.0}" \
+    --port="${APP_PORT:-8000}" \
+    --workers="${OCTANE_WORKERS:-4}" \
+    --task-workers="${OCTANE_TASK_WORKERS:-2}" \
+    --max-requests="${OCTANE_MAX_REQUESTS:-500}"
