@@ -9,6 +9,7 @@ use App\Enums\PaymentStatuses;
 use App\Filament\RelationManagers\OrderItemsRelationManager;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -145,11 +146,11 @@ class OrderResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()->label('Chỉnh sửa'),
+                Actions\EditAction::make()->label('Chỉnh sửa'),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()->label('Xóa đã chọn'),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make()->label('Xóa đã chọn'),
                 ]),
             ])
             ->defaultSort('id', 'desc');
