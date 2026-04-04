@@ -9,8 +9,11 @@
 .env
 .env.backup
 .env.production
+secret.env.production
 deploy/env/*.env
 !deploy/env/*.example
+infrastructure/ansible/env/.env.production
+infrastructure/ansible/env/secret.env.production
 infrastructure/ansible/inventory/hosts.ini
 .phpactor.json
 .phpunit.result.cache

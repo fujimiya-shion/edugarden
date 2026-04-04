@@ -1,3 +1,2 @@
 ---
-secret_env_file: "/opt/edugarden/secret.env"
-mysql_secret_env_file: "{{ secret_env_file }}"
+mysql_secret_env_file: "{{ private_env_file | default(secret_env_file | default('/opt/edugarden/secret.env')) }}"

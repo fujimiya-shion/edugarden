@@ -1,7 +1,7 @@
 ---
 nginx_domain: example.com
-public_env_file: "{{ playbook_dir }}/../../.env"
-secret_env_file: "/opt/edugarden/secret.env"
+public_env_file: "/var/www/html/edugarden/.env"
+private_env_file: "{{ secret_env_file | default('/opt/edugarden/secret.env') }}"
 nginx_client_max_body_size: 64m
 nginx_proxy_read_timeout: 300s
 nginx_proxy_connect_timeout: 60s

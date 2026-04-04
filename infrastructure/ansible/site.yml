@@ -3,12 +3,20 @@
   hosts: app_servers
   become: true
   roles:
+    - role: env_sync
+      vars:
+        sync_public_env: true
+        sync_private_env: true
     - docker
 
 - name: Provision MySQL servers
   hosts: mysql_servers
   become: true
   roles:
+    - role: env_sync
+      vars:
+        sync_public_env: false
+        sync_private_env: true
     - mysql
 
 - name: Provision Redis servers
@@ -21,4 +29,8 @@
   hosts: lb_servers
   become: true
   roles:
+    - role: env_sync
+      vars:
+        sync_public_env: true
+        sync_private_env: true
     - nginx

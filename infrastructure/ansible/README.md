@@ -4,12 +4,15 @@ This directory provisions the base server dependencies for EduGarden.
 
 What it installs:
 
+- `env_sync` role on `app_servers`, `mysql_servers`, `lb_servers`
+  - copies local `env/.env.production` to each host's `public_env_file`
+  - copies local `env/secret.env.production` to each host's `private_env_file`
 - `docker` role on `app_servers`
   - Docker Engine
   - Docker Compose plugin
 - `mysql` role on `mysql_servers`
   - MySQL Server
-  - reads `DB_ROOT_PASSWORD`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` from `secret_env_file`
+  - reads `DB_ROOT_PASSWORD`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` from `private_env_file`
 - `redis` role on `redis_servers`
   - Redis Server
 - `nginx` role on `lb_servers`
@@ -21,7 +24,10 @@ What it installs:
 ## Structure
 
 - `inventory/hosts.ini.example`: inventory template
+- `env/.env.production.example`: public production env template
+- `env/secret.env.production.example`: private production env template
 - `site.yml`: main playbook
+- `roles/env_sync`: copy local env files to remote servers
 - `roles/docker`: install Docker and Compose plugin
 - `roles/mysql`: install MySQL Server
 - `roles/redis`: install Redis Server
@@ -37,10 +43,12 @@ cp inventory/hosts.ini.example inventory/hosts.ini
 ```
 
 2. Edit `inventory/hosts.ini` with real hosts and SSH users.
-   Set `secret_env_file` on each `mysql_servers` host if the secret path differs.
+   Copy `env/.env.production.example` to `env/.env.production` and fill the public values locally.
+   Copy `env/secret.env.production.example` to `env/secret.env.production` and fill the private values locally.
+   Set `private_env_file` on each `mysql_servers` host if the remote secret path differs.
    Set `nginx_domain` on each `lb_servers` host.
    Set `public_env_file` on each `app_servers` host if the app env path differs.
-   Set `public_env_file` and `secret_env_file` on each `lb_servers` host if your deploy paths differ.
+   Set `public_env_file` and `private_env_file` on each `app_servers` or `lb_servers` host if your deploy paths differ.
    The nginx role uses `APP_PORT_FORWARD` resolved from each app server env file.
    SSL certs are expected to be created separately with `certbot`.
 

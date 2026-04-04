@@ -1,0 +1,66 @@
+---
+- name: Check local public env file
+  ansible.builtin.stat:
+    path: "{{ local_public_env_file }}"
+  delegate_to: localhost
+  become: false
+  register: local_public_env_stat
+  when: sync_public_env
+
+- name: Ensure local public env file exists
+  ansible.builtin.assert:
+    that:
+      - local_public_env_stat.stat.exists
+    fail_msg: "Missing local public env file: {{ local_public_env_file }}"
+  when: sync_public_env
+
+- name: Check local private env file
+  ansible.builtin.stat:
+    path: "{{ local_private_env_file }}"
+  delegate_to: localhost
+  become: false
+  register: local_private_env_stat
+  when: sync_private_env
+
+- name: Ensure local private env file exists
+  ansible.builtin.assert:
+    that:
+      - local_private_env_stat.stat.exists
+    fail_msg: "Missing local private env file: {{ local_private_env_file }}"
+  when: sync_private_env
+
+- name: Ensure public env directory exists
+  ansible.builtin.file:
+    path: "{{ public_env_file | dirname }}"
+    state: directory
+    owner: "{{ public_env_owner }}"
+    group: "{{ public_env_group }}"
+    mode: "0755"
+  when: sync_public_env
+
+- name: Copy public env file to server
+  ansible.builtin.copy:
+    src: "{{ local_public_env_file }}"
+    dest: "{{ public_env_file }}"
+    owner: "{{ public_env_owner }}"
+    group: "{{ public_env_group }}"
+    mode: "{{ public_env_mode }}"
+  when: sync_public_env
+
+- name: Ensure private env directory exists
+  ansible.builtin.file:
+    path: "{{ private_env_file | dirname }}"
+    state: directory
+    owner: "{{ private_env_owner }}"
+    group: "{{ private_env_group }}"
+    mode: "0755"
+  when: sync_private_env
+
+- name: Copy private env file to server
+  ansible.builtin.copy:
+    src: "{{ local_private_env_file }}"
+    dest: "{{ private_env_file }}"
+    owner: "{{ private_env_owner }}"
+    group: "{{ private_env_group }}"
+    mode: "{{ private_env_mode }}"
+  when: sync_private_env

@@ -1,0 +1,17 @@
+---
+local_public_env_file: "{{ playbook_dir }}/env/.env.production"
+local_private_env_file: "{{ playbook_dir }}/env/secret.env.production"
+
+sync_public_env: true
+sync_private_env: true
+
+public_env_file: "/var/www/html/edugarden/.env"
+private_env_file: "{{ secret_env_file | default('/opt/edugarden/secret.env') }}"
+
+public_env_owner: root
+public_env_group: root
+public_env_mode: "0644"
+
+private_env_owner: root
+private_env_group: root
+private_env_mode: "0600"
