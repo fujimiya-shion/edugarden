@@ -1,6 +1,6 @@
 ---
-local_public_env_file: "{{ playbook_dir }}/env/.env.production"
-local_private_env_file: "{{ playbook_dir }}/env/secret.env.production"
+local_public_env_file: "{{ playbook_dir }}/templates/public.env.j2"
+local_private_env_file: "{{ playbook_dir }}/templates/private.env.j2"
 
 sync_public_env: true
 sync_private_env: true

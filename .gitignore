@@ -12,8 +12,8 @@
 secret.env.production
 deploy/env/*.env
 !deploy/env/*.example
-infrastructure/ansible/env/.env.production
-infrastructure/ansible/env/secret.env.production
+infrastructure/ansible/templates/public.env.j2
+infrastructure/ansible/templates/private.env.j2
 infrastructure/ansible/inventory/hosts.ini
 .phpactor.json
 .phpunit.result.cache

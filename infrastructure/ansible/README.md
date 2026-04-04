@@ -5,8 +5,8 @@ This directory provisions the base server dependencies for EduGarden.
 What it installs:
 
 - `env_sync` role on `app_servers`, `mysql_servers`, `redis_servers`, `lb_servers`
-  - renders local `env/.env.production` as a template to each host's `public_env_file`
-  - renders local `env/secret.env.production` as a template to each host's `private_env_file`
+  - renders local `templates/public.env.j2` to each host's `public_env_file`
+  - renders local `templates/private.env.j2` to each host's `private_env_file`
   - injects `DB_HOST` and `REDIS_HOST` from the first host in `mysql_servers` and `redis_servers`
 - `docker` role on `app_servers`
   - Docker Engine
@@ -26,8 +26,8 @@ What it installs:
 ## Structure
 
 - `inventory/hosts.ini.example`: inventory template
-- `env/.env.production.example`: public production env template
-- `env/secret.env.production.example`: private production env template
+- `templates/public.env.j2.example`: public production env template
+- `templates/private.env.j2.example`: private production env template
 - `site.yml`: main playbook
 - `roles/env_sync`: copy local env files to remote servers
 - `roles/docker`: install Docker and Compose plugin
@@ -45,8 +45,8 @@ cp inventory/hosts.ini.example inventory/hosts.ini
 ```
 
 2. Edit `inventory/hosts.ini` with real hosts and SSH users.
-   Copy `env/.env.production.example` to `env/.env.production` and treat it as an Ansible template.
-   Copy `env/secret.env.production.example` to `env/secret.env.production` and fill the private values locally.
+   Copy `templates/public.env.j2.example` to `templates/public.env.j2` and treat it as an Ansible template.
+   Copy `templates/private.env.j2.example` to `templates/private.env.j2` and fill the private values locally.
    Set `private_env_file` on each `mysql_servers` host if the remote secret path differs.
    Set `private_env_file` on each `redis_servers` host if the remote secret path differs.
    Set `nginx_domain` on each `lb_servers` host.
