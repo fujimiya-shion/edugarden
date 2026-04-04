@@ -27,7 +27,7 @@ class AppSettingResource extends Resource
                 Forms\Components\Toggle::make('is_active')
                     ->label('Sử dụng cấu hình này'),
 
-                Forms\Components\Card::make()
+                Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Repeater::make('sections')
                             ->label('Quản lý trang chủ')
@@ -59,7 +59,7 @@ class AppSettingResource extends Resource
                     ])
                     ->label('Quản lý Trang Chủ'),
 
-                Forms\Components\Card::make()
+                Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\TextInput::make(' meta_title')
                             ->label('Meta Title')

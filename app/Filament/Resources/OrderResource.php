@@ -31,7 +31,7 @@ class OrderResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Card::make([
+                Forms\Components\Section::make([
                     Forms\Components\Placeholder::make('user_id')
                         ->label('Khách hàng')
                         ->content(fn ($record) => $record?->userAddress?->name),
