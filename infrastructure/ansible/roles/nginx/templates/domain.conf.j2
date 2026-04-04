@@ -18,3 +18,5 @@ server {
         return 301 https://$host$request_uri;
     }
 }
+
+include /etc/nginx/conf.d/{{ nginx_domain }}.d/ssl.conf;
