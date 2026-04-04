@@ -9,8 +9,10 @@ use App\Enums\PaymentStatuses;
 use App\Filament\RelationManagers\OrderItemsRelationManager;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -30,7 +32,7 @@ class OrderResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Card::make([
+                Section::make([
                     Forms\Components\Placeholder::make('user_id')
                         ->label('Khách hàng')
                         ->content(fn ($record) => $record?->userAddress?->name),
@@ -145,11 +147,11 @@ class OrderResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()->label('Chỉnh sửa'),
+                Actions\EditAction::make()->label('Chỉnh sửa'),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()->label('Xóa đã chọn'),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make()->label('Xóa đã chọn'),
                 ]),
             ])
             ->defaultSort('id', 'desc');

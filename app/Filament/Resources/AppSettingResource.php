@@ -7,8 +7,10 @@ use App\Enums\ModuleTypes;
 use App\Filament\Resources\AppSettingResource\Pages;
 use App\Models\AppSetting;
 use App\Models\Page;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -26,7 +28,7 @@ class AppSettingResource extends Resource
                 Forms\Components\Toggle::make('is_active')
                     ->label('Sử dụng cấu hình này'),
 
-                Forms\Components\Card::make()
+                Section::make()
                     ->schema([
                         Forms\Components\Repeater::make('sections')
                             ->label('Quản lý trang chủ')
@@ -58,7 +60,7 @@ class AppSettingResource extends Resource
                     ])
                     ->label('Quản lý Trang Chủ'),
 
-                Forms\Components\Card::make()
+                Section::make()
                     ->schema([
                         Forms\Components\TextInput::make(' meta_title')
                             ->label('Meta Title')
@@ -149,13 +151,13 @@ class AppSettingResource extends Resource
                 // Thêm filters nếu cần
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Actions\ViewAction::make(),
+                Actions\EditAction::make(),
+                Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

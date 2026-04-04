@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use BackedEnum;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -80,7 +81,7 @@ class UserResource extends Resource
                     ->relationship('church', 'name'),      
             ])
             ->actions([
-                Tables\Actions\Action::make('changePassword')
+                Actions\Action::make('changePassword')
                     ->label('Đổi mật khẩu')
                     ->modalHeading('Đổi mật khẩu tài khoản')
                     ->modalDescription('Vui lòng nhập mật khẩu mới cho tài khoản')
@@ -99,12 +100,12 @@ class UserResource extends Resource
                     ->color('warning')
                     ->icon('heroicon-s-lock-closed'),
 
-                Tables\Actions\EditAction::make()->label('Sửa'),
-                Tables\Actions\DeleteAction::make()->label('Xoá'),
+                Actions\EditAction::make()->label('Sửa'),
+                Actions\DeleteAction::make()->label('Xoá'),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()->label('Xoá đã chọn'),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make()->label('Xoá đã chọn'),
                 ]),
             ])
             ->defaultSort('id', 'desc');

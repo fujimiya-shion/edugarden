@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use BackedEnum;
 use App\Filament\Resources\DonateResource\Pages;
 use App\Models\Donate;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -42,11 +43,11 @@ class DonateResource extends Resource
             Tables\Columns\TextColumn::make('created_at')->label('Thời gian')->dateTime('d/m/Y H:i'),
         ])
         ->actions([
-            Tables\Actions\EditAction::make(),
-            Tables\Actions\DeleteAction::make(),
+            Actions\EditAction::make(),
+            Actions\DeleteAction::make(),
         ])
         ->bulkActions([
-            Tables\Actions\DeleteBulkAction::make(),
+            Actions\DeleteBulkAction::make(),
         ]);
     }
 

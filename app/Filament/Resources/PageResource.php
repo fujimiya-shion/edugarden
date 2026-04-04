@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use BackedEnum;
 use App\Filament\Resources\PageResource\Pages;
 use App\Models\Page;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -76,12 +77,12 @@ class PageResource extends Resource
                 Tables\Columns\ImageColumn::make('image')->label('Ảnh'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()->label('Chỉnh sửa'),
-                Tables\Actions\DeleteAction::make()->label('Xoá'),
+                Actions\EditAction::make()->label('Chỉnh sửa'),
+                Actions\DeleteAction::make()->label('Xoá'),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()->label('Xóa hàng loạt'),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make()->label('Xóa hàng loạt'),
                 ]),
             ]);
     }

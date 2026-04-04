@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use BackedEnum;
 use App\Filament\Resources\ContactResource\Pages;
 use App\Models\Contact;
+use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -61,12 +62,12 @@ class ContactResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->label('Xem'),
-                Tables\Actions\EditAction::make()->label('Chỉnh sửa'),
+                Actions\ViewAction::make()->label('Xem'),
+                Actions\EditAction::make()->label('Chỉnh sửa'),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()->label('Xóa đã chọn'),
+                Actions\BulkActionGroup::make([
+                    Actions\DeleteBulkAction::make()->label('Xóa đã chọn'),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
