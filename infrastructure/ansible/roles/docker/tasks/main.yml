@@ -57,6 +57,23 @@
     state: started
     enabled: true
 
+- name: Ensure docker-compose wrapper is available
+  ansible.builtin.copy:
+    dest: /usr/local/bin/docker-compose
+    mode: "0755"
+    content: |
+      #!/usr/bin/env bash
+      exec docker compose "$@"
+
+- name: Verify Docker Compose is available
+  ansible.builtin.command:
+    argv:
+      - docker
+      - compose
+      - version
+  register: docker_compose_version
+  changed_when: false
+
 - name: Add SSH user to docker group
   ansible.builtin.user:
     name: "{{ ansible_user }}"
