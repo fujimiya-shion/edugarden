@@ -12,6 +12,58 @@
     state: present
     update_cache: true
 
+- name: Check secret env file on Redis server
+  ansible.builtin.stat:
+    path: "{{ redis_secret_env_file }}"
+  register: redis_secret_env_stat
+
+- name: Ensure secret env file exists on Redis server
+  ansible.builtin.assert:
+    that:
+      - redis_secret_env_stat.stat.exists
+    fail_msg: "Missing secret env file on Redis server: {{ redis_secret_env_file }}"
+
+- name: Read Redis password from secret env file
+  ansible.builtin.shell: |
+    set -e
+    awk -F= '
+      /^REDIS_PASSWORD=/{print substr($0, index($0, "=") + 1)}
+    ' "{{ redis_secret_env_file }}"
+  register: redis_password_lookup
+  changed_when: false
+
+- name: Resolve Redis password
+  ansible.builtin.set_fact:
+    redis_password: "{{ redis_password_lookup.stdout | trim }}"
+
+- name: Ensure Redis password is set
+  ansible.builtin.assert:
+    that:
+      - redis_password | length > 0
+      - redis_password != "null"
+    fail_msg: "REDIS_PASSWORD must be set in {{ redis_secret_env_file }}"
+
+- name: Allow Redis to listen on the server network
+  ansible.builtin.lineinfile:
+    path: /etc/redis/redis.conf
+    regexp: '^[# ]*bind\s+'
+    line: "bind 0.0.0.0"
+  notify: Restart redis
+
+- name: Configure Redis password when provided
+  ansible.builtin.lineinfile:
+    path: /etc/redis/redis.conf
+    regexp: '^[# ]*requirepass\s+'
+    line: "requirepass {{ redis_password }}"
+  notify: Restart redis
+
+- name: Ensure Redis protected mode stays enabled
+  ansible.builtin.lineinfile:
+    path: /etc/redis/redis.conf
+    regexp: '^[# ]*protected-mode\s+'
+    line: "protected-mode yes"
+  notify: Restart redis
+
 - name: Ensure Redis service is enabled and started
   ansible.builtin.service:
     name: redis-server

@@ -19,6 +19,13 @@
     state: started
     enabled: true
 
+- name: Allow MySQL to listen on the server network
+  ansible.builtin.lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: '^[# ]*bind-address\s*='
+    line: "bind-address = 0.0.0.0"
+  notify: Restart mysql
+
 - name: Check secret env file on MySQL server
   ansible.builtin.stat:
     path: "{{ mysql_secret_env_file }}"

@@ -39,7 +39,7 @@
   when: sync_public_env
 
 - name: Copy public env file to server
-  ansible.builtin.copy:
+  ansible.builtin.template:
     src: "{{ local_public_env_file }}"
     dest: "{{ public_env_file }}"
     owner: "{{ public_env_owner }}"
@@ -57,7 +57,7 @@
   when: sync_private_env
 
 - name: Copy private env file to server
-  ansible.builtin.copy:
+  ansible.builtin.template:
     src: "{{ local_private_env_file }}"
     dest: "{{ private_env_file }}"
     owner: "{{ private_env_owner }}"

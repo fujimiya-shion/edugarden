@@ -4,9 +4,10 @@ This directory provisions the base server dependencies for EduGarden.
 
 What it installs:
 
-- `env_sync` role on `app_servers`, `mysql_servers`, `lb_servers`
-  - copies local `env/.env.production` to each host's `public_env_file`
-  - copies local `env/secret.env.production` to each host's `private_env_file`
+- `env_sync` role on `app_servers`, `mysql_servers`, `redis_servers`, `lb_servers`
+  - renders local `env/.env.production` as a template to each host's `public_env_file`
+  - renders local `env/secret.env.production` as a template to each host's `private_env_file`
+  - injects `DB_HOST` and `REDIS_HOST` from the first host in `mysql_servers` and `redis_servers`
 - `docker` role on `app_servers`
   - Docker Engine
   - Docker Compose plugin
@@ -15,6 +16,7 @@ What it installs:
   - reads `DB_ROOT_PASSWORD`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` from `private_env_file`
 - `redis` role on `redis_servers`
   - Redis Server
+  - reads `REDIS_PASSWORD` from `private_env_file`
 - `nginx` role on `lb_servers`
   - Nginx
   - Certbot
@@ -43,12 +45,14 @@ cp inventory/hosts.ini.example inventory/hosts.ini
 ```
 
 2. Edit `inventory/hosts.ini` with real hosts and SSH users.
-   Copy `env/.env.production.example` to `env/.env.production` and fill the public values locally.
+   Copy `env/.env.production.example` to `env/.env.production` and treat it as an Ansible template.
    Copy `env/secret.env.production.example` to `env/secret.env.production` and fill the private values locally.
    Set `private_env_file` on each `mysql_servers` host if the remote secret path differs.
+   Set `private_env_file` on each `redis_servers` host if the remote secret path differs.
    Set `nginx_domain` on each `lb_servers` host.
    Set `public_env_file` on each `app_servers` host if the app env path differs.
    Set `public_env_file` and `private_env_file` on each `app_servers` or `lb_servers` host if your deploy paths differ.
+   `DB_HOST` and `REDIS_HOST` in the public env are rendered from the inventory hosts.
    The nginx role uses `APP_PORT_FORWARD` resolved from each app server env file.
    SSL certs are expected to be created separately with `certbot`.
 

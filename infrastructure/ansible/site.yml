@@ -23,6 +23,10 @@
   hosts: redis_servers
   become: true
   roles:
+    - role: env_sync
+      vars:
+        sync_public_env: false
+        sync_private_env: true
     - redis
 
 - name: Provision load balancers
