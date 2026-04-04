@@ -61,7 +61,14 @@
   ansible.builtin.lineinfile:
     path: /etc/redis/redis.conf
     regexp: '^[# ]*protected-mode\s+'
-    line: "protected-mode yes"
+    line: "protected-mode no"
+  notify: Restart redis
+
+- name: Ensure Redis port is set
+  ansible.builtin.lineinfile:
+    path: /etc/redis/redis.conf
+    regexp: '^[# ]*port\s+'
+    line: "port 6379"
   notify: Restart redis
 
 - name: Ensure Redis service is enabled and started

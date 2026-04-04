@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+APP_DIR="${APP_DIR:-{{ app_dir }}}"
+PUBLIC_ENV_FILE="${PUBLIC_ENV_FILE:-{{ public_env_file }}}"
+SECRET_ENV_FILE="${SECRET_ENV_FILE:-{{ private_env_file }}}"
+COMPOSE_FILE="${COMPOSE_FILE:-{{ compose_file }}}"
+
+if [[ ! -d "$APP_DIR" ]]; then
+    echo "Missing app directory: $APP_DIR" >&2
+    exit 1
+fi
+
+if [[ ! -f "$PUBLIC_ENV_FILE" ]]; then
+    echo "Missing public env file: $PUBLIC_ENV_FILE" >&2
+    exit 1
+fi
+
+if [[ ! -f "$SECRET_ENV_FILE" ]]; then
+    echo "Missing secret env file: $SECRET_ENV_FILE" >&2
+    exit 1
+fi
+
+if [[ ! -f "$COMPOSE_FILE" ]]; then
+    echo "Missing compose file: $COMPOSE_FILE" >&2
+    exit 1
+fi
+
+APP_IMAGE="$(grep -E '^APP_IMAGE=' "$PUBLIC_ENV_FILE" | tail -n 1 | cut -d '=' -f 2- || true)"
+
+if [[ -z "$APP_IMAGE" ]]; then
+    echo "APP_IMAGE is missing in $PUBLIC_ENV_FILE" >&2
+    exit 1
+fi
+
+echo "Using APP_DIR=$APP_DIR"
+echo "Using APP_IMAGE=$APP_IMAGE"
+echo "Using PUBLIC_ENV_FILE=$PUBLIC_ENV_FILE"
+echo "Using SECRET_ENV_FILE=$SECRET_ENV_FILE"
+
+cd "$APP_DIR"
+
+docker compose \
+  --env-file "$PUBLIC_ENV_FILE" \
+  --env-file "$SECRET_ENV_FILE" \
+  -f "$COMPOSE_FILE" \
+  pull
+
+docker compose \
+  --env-file "$PUBLIC_ENV_FILE" \
+  --env-file "$SECRET_ENV_FILE" \
+  -f "$COMPOSE_FILE" \
+  up -d --remove-orphans

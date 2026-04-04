@@ -1,2 +1,2 @@
 ---
-redis_secret_env_file: "{{ private_env_file | default(secret_env_file | default('/opt/edugarden/secret.env')) }}"
+redis_secret_env_file: "{{ private_env_file | default(secret_env_file | default('/opt/edugarden/secret.env.production')) }}"

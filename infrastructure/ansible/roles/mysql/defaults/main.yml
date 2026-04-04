@@ -1,2 +1,5 @@
 ---
-mysql_secret_env_file: "{{ private_env_file | default(secret_env_file | default('/opt/edugarden/secret.env')) }}"
+mysql_secret_env_file: "{{ private_env_file | default(secret_env_file | default('/opt/edugarden/secret.env.production')) }}"
+mysql_bind_address: "0.0.0.0"
+mysql_port: "3306"
+mysql_allowed_remote_host: "%"

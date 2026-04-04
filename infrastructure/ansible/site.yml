@@ -7,6 +7,7 @@
       vars:
         sync_public_env: true
         sync_private_env: true
+        sync_run_app_script: true
     - docker
 
 - name: Provision MySQL servers

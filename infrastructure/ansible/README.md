@@ -8,6 +8,7 @@ What it installs:
   - renders local `templates/public.env.j2` to each host's `public_env_file`
   - renders local `templates/private.env.j2` to each host's `private_env_file`
   - injects `DB_HOST` and `REDIS_HOST` from the first host in `mysql_servers` and `redis_servers`
+  - renders `templates/run-app.sh.j2` to each app server's `run_app_remote_file`
 - `docker` role on `app_servers`
   - Docker Engine
   - Docker Compose plugin
@@ -28,6 +29,7 @@ What it installs:
 - `inventory/hosts.ini.example`: inventory template
 - `templates/public.env.j2.example`: public production env template
 - `templates/private.env.j2.example`: private production env template
+- `templates/run-app.sh.j2`: remote deploy script template
 - `site.yml`: main playbook
 - `roles/env_sync`: copy local env files to remote servers
 - `roles/docker`: install Docker and Compose plugin

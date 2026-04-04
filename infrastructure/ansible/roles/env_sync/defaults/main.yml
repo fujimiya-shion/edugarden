@@ -4,9 +4,14 @@ local_private_env_file: "{{ playbook_dir }}/templates/private.env.j2"
 
 sync_public_env: true
 sync_private_env: true
+sync_run_app_script: false
 
 public_env_file: "/var/www/html/edugarden/.env"
-private_env_file: "{{ secret_env_file | default('/opt/edugarden/secret.env') }}"
+private_env_file: "{{ secret_env_file | default('/opt/edugarden/secret.env.production') }}"
+app_dir: "{{ public_env_file | dirname }}"
+run_app_template_file: "{{ playbook_dir }}/templates/run-app.sh.j2"
+run_app_remote_file: "{{ app_dir }}/run-app.sh"
+compose_file: "{{ app_dir }}/docker-compose-prod.yaml"
 
 public_env_owner: root
 public_env_group: root
@@ -15,6 +20,10 @@ public_env_mode: "0644"
 private_env_owner: root
 private_env_group: root
 private_env_mode: "0600"
+
+run_app_owner: root
+run_app_group: root
+run_app_mode: "0755"
 
 env_sync_mysql_host: >-
   {{

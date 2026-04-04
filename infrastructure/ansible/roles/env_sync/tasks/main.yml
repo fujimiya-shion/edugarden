@@ -29,6 +29,21 @@
     fail_msg: "Missing local private env file: {{ local_private_env_file }}"
   when: sync_private_env
 
+- name: Check local run app template file
+  ansible.builtin.stat:
+    path: "{{ run_app_template_file }}"
+  delegate_to: localhost
+  become: false
+  register: run_app_template_stat
+  when: sync_run_app_script
+
+- name: Ensure local run app template file exists
+  ansible.builtin.assert:
+    that:
+      - run_app_template_stat.stat.exists
+    fail_msg: "Missing local run app template file: {{ run_app_template_file }}"
+  when: sync_run_app_script
+
 - name: Ensure public env directory exists
   ansible.builtin.file:
     path: "{{ public_env_file | dirname }}"
@@ -64,3 +79,12 @@
     group: "{{ private_env_group }}"
     mode: "{{ private_env_mode }}"
   when: sync_private_env
+
+- name: Copy run app script to server
+  ansible.builtin.template:
+    src: "{{ run_app_template_file }}"
+    dest: "{{ run_app_remote_file }}"
+    owner: "{{ run_app_owner }}"
+    group: "{{ run_app_group }}"
+    mode: "{{ run_app_mode }}"
+  when: sync_run_app_script

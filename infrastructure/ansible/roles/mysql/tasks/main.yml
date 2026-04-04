@@ -23,7 +23,14 @@
   ansible.builtin.lineinfile:
     path: /etc/mysql/mysql.conf.d/mysqld.cnf
     regexp: '^[# ]*bind-address\s*='
-    line: "bind-address = 0.0.0.0"
+    line: "bind-address = {{ mysql_bind_address }}"
+  notify: Restart mysql
+
+- name: Ensure MySQL port is set
+  ansible.builtin.lineinfile:
+    path: /etc/mysql/mysql.conf.d/mysqld.cnf
+    regexp: '^[# ]*port\s*='
+    line: "port = {{ mysql_port }}"
   notify: Restart mysql
 
 - name: Check secret env file on MySQL server
@@ -51,10 +58,10 @@
 
 - name: Resolve database settings
   ansible.builtin.set_fact:
-    mysql_app_database: "{{ mysql_env_values.stdout | regex_search('(?m)^DB_DATABASE=(.*)$', '\\1') | first | default('') }}"
-    mysql_app_username: "{{ mysql_env_values.stdout | regex_search('(?m)^DB_USERNAME=(.*)$', '\\1') | first | default('') }}"
-    mysql_app_password: "{{ mysql_env_values.stdout | regex_search('(?m)^DB_PASSWORD=(.*)$', '\\1') | first | default('') }}"
-    mysql_root_password: "{{ mysql_env_values.stdout | regex_search('(?m)^DB_ROOT_PASSWORD=(.*)$', '\\1') | first | default('') }}"
+    mysql_app_database: "{{ mysql_env_values.stdout | regex_findall('(?m)^DB_DATABASE=(.*)$') | first | default('') }}"
+    mysql_app_username: "{{ mysql_env_values.stdout | regex_findall('(?m)^DB_USERNAME=(.*)$') | first | default('') }}"
+    mysql_app_password: "{{ mysql_env_values.stdout | regex_findall('(?m)^DB_PASSWORD=(.*)$') | first | default('') }}"
+    mysql_root_password: "{{ mysql_env_values.stdout | regex_findall('(?m)^DB_ROOT_PASSWORD=(.*)$') | first | default('') }}"
 
 - name: Ensure required MySQL env values are present
   ansible.builtin.assert:
@@ -100,13 +107,21 @@
     SQL
   changed_when: false
 
-- name: Ensure application MySQL user exists
+- name: Ensure application MySQL user can connect remotely
   ansible.builtin.shell: |
     set -e
     MYSQL_PWD='{{ mysql_root_password }}' mysql --protocol=socket -uroot <<'SQL'
-    CREATE USER IF NOT EXISTS '{{ mysql_app_username }}'@'%' IDENTIFIED BY '{{ mysql_app_password }}';
-    ALTER USER '{{ mysql_app_username }}'@'%' IDENTIFIED BY '{{ mysql_app_password }}';
-    GRANT ALL PRIVILEGES ON `{{ mysql_app_database }}`.* TO '{{ mysql_app_username }}'@'%';
+    CREATE USER IF NOT EXISTS '{{ mysql_app_username }}'@'{{ mysql_allowed_remote_host }}' IDENTIFIED BY '{{ mysql_app_password }}';
+    ALTER USER '{{ mysql_app_username }}'@'{{ mysql_allowed_remote_host }}' IDENTIFIED BY '{{ mysql_app_password }}';
+    SQL
+  when: mysql_app_username != "root"
+  changed_when: false
+
+- name: Grant application database privileges to remote MySQL user
+  ansible.builtin.shell: |
+    set -e
+    MYSQL_PWD='{{ mysql_root_password }}' mysql --protocol=socket -uroot <<'SQL'
+    GRANT ALL PRIVILEGES ON `{{ mysql_app_database }}`.* TO '{{ mysql_app_username }}'@'{{ mysql_allowed_remote_host }}';
     FLUSH PRIVILEGES;
     SQL
   when: mysql_app_username != "root"

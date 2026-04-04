@@ -1,11 +1,11 @@
 [app_servers]
-app-1 ansible_host=203.0.113.10 ansible_user=ubuntu public_env_file=/var/www/html/edugarden/.env private_env_file=/opt/edugarden/secret.env
+app-1 ansible_host=203.0.113.10 ansible_user=ubuntu public_env_file=/var/www/html/edugarden/.env private_env_file=/opt/edugarden/secret.env.production
 
 [mysql_servers]
-mysql-1 ansible_host=203.0.113.30 ansible_user=ubuntu private_env_file=/opt/edugarden/secret.env
+mysql-1 ansible_host=203.0.113.30 ansible_user=ubuntu private_env_file=/opt/edugarden/secret.env.production
 
 [redis_servers]
-redis-1 ansible_host=203.0.113.40 ansible_user=ubuntu private_env_file=/opt/edugarden/secret.env
+redis-1 ansible_host=203.0.113.40 ansible_user=ubuntu private_env_file=/opt/edugarden/secret.env.production
 
 [lb_servers]
-lb-1 ansible_host=203.0.113.20 ansible_user=ubuntu nginx_domain=domain.com public_env_file=/var/www/html/edugarden/.env private_env_file=/opt/edugarden/secret.env
+lb-1 ansible_host=203.0.113.20 ansible_user=ubuntu nginx_domain=domain.com public_env_file=/var/www/html/edugarden/.env private_env_file=/opt/edugarden/secret.env.production
